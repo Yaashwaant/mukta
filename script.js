@@ -1,94 +1,62 @@
-/*--------------------
-Vars
---------------------*/
-let progress = 50
-let startX = 0
-let active = 0
-let isDown = false
-
-/*--------------------
-Contants
---------------------*/
-const speedWheel = 0.02
-const speedDrag = -0.1
-
-/*--------------------
-Get Z
---------------------*/
-const getZindex = (array, index) => (array.map((_, i) => (index === i) ? array.length : array.length - Math.abs(index - i)))
-
-/*--------------------
-Items
---------------------*/
-const $items = document.querySelectorAll('.carousel-item')
-const $cursors = document.querySelectorAll('.cursor')
-
-const displayItems = (item, index, active) => {
-  const zIndex = getZindex([...$items], active)[index]
-  item.style.setProperty('--zIndex', zIndex)
-  item.style.setProperty('--active', (index-active)/$items.length)
+body {
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(135deg, black, #220033);
+  color: white;
+  text-align: center;
 }
 
-/*--------------------
-Animate
---------------------*/
-const animate = () => {
-  progress = Math.max(0, Math.min(progress, 100))
-  active = Math.floor(progress/100*($items.length-1))
-  
-  $items.forEach((item, index) => displayItems(item, index, active))
-}
-animate()
-
-/*--------------------
-Click on Items
---------------------*/
-$items.forEach((item, i) => {
-  item.addEventListener('click', () => {
-    progress = (i/$items.length) * 100 + 10
-    animate()
-  })
-})
-
-/*--------------------
-Handlers
---------------------*/
-const handleWheel = e => {
-  const wheelProgress = e.deltaY * speedWheel
-  progress = progress + wheelProgress
-  animate()
+.carousel {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-const handleMouseMove = (e) => {
-  if (e.type === 'mousemove') {
-    $cursors.forEach(($cursor) => {
-      $cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`
-    })
-  }
-  if (!isDown) return
-  const x = e.clientX || (e.touches && e.touches[0].clientX) || 0
-  const mouseProgress = (x - startX) * speedDrag
-  progress = progress + mouseProgress
-  startX = x
-  animate()
+.carousel-item {
+  position: absolute;
+  width: 300px;
+  height: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: black;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  transition: transform 0.8s ease-in-out;
 }
 
-const handleMouseDown = e => {
-  isDown = true
-  startX = e.clientX || (e.touches && e.touches[0].clientX) || 0
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
-const handleMouseUp = () => {
-  isDown = false
+.title {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 24px;
+  color: white;
 }
 
-/*--------------------
-Listeners
---------------------*/
-document.addEventListener('mousewheel', handleWheel)
-document.addEventListener('mousedown', handleMouseDown)
-document.addEventListener('mousemove', handleMouseMove)
-document.addEventListener('mouseup', handleMouseUp)
-document.addEventListener('touchstart', handleMouseDown)
-document.addEventListener('touchmove', handleMouseMove)
-document.addEventListener('touchend', handleMouseUp)
+.num {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font-size: 30px;
+  color: white;
+}
+
+.cursor {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  display: none;
+}
